@@ -15,8 +15,8 @@ This is a Prometheus metrics exporter for the [UK Carbon Intensity API](https://
 	* `{fuel}`: The type of fuel used for electricity generation (e.g., `solar`).
 * `carbon_intensity_forecast`: Forecasted carbon intensity in gCO2/kWh.
 	* `{index}`: Human-friendly representation of the forecasted carbon intensity (e.g., `low`).
-* `carbon_intensity_period_from`: Unix timestamp of the start of the data period.
-* `carbon_intensity_period_to`: Unix timestamp of the end of the data period (often 30 minutes after the start).
+* `carbon_period_from`: Unix timestamp of the start of the data period.
+* `carbon_period_to`: Unix timestamp of the end of the data period (often 30 minutes after the start).
 
 ### Global Labels
 
