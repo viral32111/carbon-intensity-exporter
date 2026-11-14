@@ -73,32 +73,41 @@
 	"cSpell.language": "en-GB",
 	"cSpell.files": ["**/*.go", "**/*.md"],
 	"cSpell.words": [
-		"errgroup",
 		"GOARCH",
-		"godotenv",
-		"GOOS",
-		"netlink",
-		"promhttp"
+		"GOOS"
 	],
 
 	// Custom colours
 	"workbench.colorCustomizations": {
-		"activityBar.activeBackground": "#7a3864",
-		"activityBar.background": "#7a3864",
-		"activityBar.foreground": "#ffffff",
-		"activityBar.inactiveForeground": "#ffffffbb",
-		"activityBarBadge.background": "#ffffffbb",
-		"activityBarBadge.foreground": "#7a3864",
-		"commandCenter.border": "#ffffff99",
-		"sash.hoverBorder": "#7a3864",
-		"statusBar.background": "#7a3864",
-		"statusBar.foreground": "#ffffff",
-		"statusBarItem.hoverBackground": "#7a3864",
-		"statusBarItem.remoteBackground": "#7a3864",
-		"statusBarItem.remoteForeground": "#ffffff",
-		"titleBar.activeBackground": "#7a3864",
-		"titleBar.activeForeground": "#ffffff",
-		"titleBar.inactiveBackground": "#7a3864ee",
-		"titleBar.inactiveForeground": "#ffffff99"
-	},
+		"titleBar.activeBackground": "#ffffff",
+		"titleBar.activeForeground": "#000000",
+		"titleBar.inactiveBackground": "#efefef",
+		"titleBar.inactiveForeground": "#000000",
+
+		"statusBar.background": "#ffffff",
+		"statusBar.foreground": "#000000",
+		"statusBar.inactiveBackground": "#efefef",
+		"statusBarItem.hoverBackground": "#efefef",
+		"statusBarItem.hoverForeground": "#000000",
+		"statusBarItem.remoteBackground": "#efefef",
+		"statusBarItem.remoteForeground": "#000000",
+
+		"activityBar.background": "#ffffff",
+		"activityBar.foreground": "#000000",
+		"activityBar.inactiveForeground": "#000000",
+
+		"modernActivityBar.border": "#000000",
+
+		"modernActivityBarItem.activeBackground": "#efefef",
+		"modernActivityBarItem.activeForeground": "#000000",
+
+		"modernActivityBarItem.hoverBackground": "#efefef",
+		"modernActivityBarItem.hoverForeground": "#000000",
+
+		"activityBarBadge.background": "#000000",
+		"activityBarBadge.foreground": "#ffffff",
+
+		"commandCenter.foreground": "#000000",
+		"commandCenter.border": "#000000"
+	}
 }
