@@ -73,7 +73,9 @@
 	"cSpell.language": "en-GB",
 	"cSpell.files": ["**/*.go", "**/*.md"],
 	"cSpell.words": [
+		"errgroup",
 		"GOARCH",
+		"godotenv",
 		"GOOS",
 		"ldflags",
 		"libc"

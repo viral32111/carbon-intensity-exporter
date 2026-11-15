@@ -11,11 +11,12 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/viral32111/carbon-intensity-exporter/internal/carbon"
 	"github.com/viral32111/carbon-intensity-exporter/internal/config"
+	"github.com/viral32111/carbon-intensity-exporter/internal/flags"
+	"github.com/viral32111/carbon-intensity-exporter/internal/log"
 	"github.com/viral32111/carbon-intensity-exporter/internal/metrics"
 	"github.com/viral32111/carbon-intensity-exporter/internal/server"
 )
@@ -75,9 +76,20 @@ func calculateNextUpdateTime() time.Time {
 }
 
 func main() {
-	isLocalDevelopment := false
-	if VERSION == "0.0.0" {
-		isLocalDevelopment = true
+	isLocalDevelopment := VERSION == "0.0.0"
+
+	/***********************/
+
+	flagResult := flags.Parse()
+
+	if flagResult.Version {
+		fmt.Println(VERSION)
+		os.Exit(0)
+	}
+
+	if flagResult.Usage {
+		flags.PrintUsage(os.Stdout)
+		os.Exit(0)
 	}
 
 	/***********************/
@@ -92,17 +104,9 @@ func main() {
 
 	/***********************/
 
-	var log *slog.Logger
-	logOptions := &slog.HandlerOptions{Level: config.LogLevel}
-	if isLocalDevelopment {
-		log = slog.New(slog.NewTextHandler(os.Stdout, logOptions))
-	} else {
-		log = slog.New(slog.NewJSONHandler(os.Stdout, logOptions))
-	}
+	logger := log.NewLogger(config.LogLevel, isLocalDevelopment)
 
-	slog.SetDefault(log)
-
-	log.Info("Hello World", "version", VERSION)
+	logger.Info("Hello World", "version", VERSION)
 
 	/***********************/
 
@@ -115,25 +119,15 @@ func main() {
 
 	httpServer, err := server.New(config)
 	if err != nil {
-		log.Error("Unable to create HTTP server", "error", err)
+		logger.Error("Unable to create HTTP server", "error", err)
 		os.Exit(1)
 	}
 
-	// Creating a new registry discards Go built-in metrics (runtime, process, etc.)
-	prometheusRegistry := prometheus.NewRegistry()
+	prometheusRegistry := metrics.NewRegistry(config.MetricsGoBuiltin)
 	metrics.Register(prometheusRegistry)
 
 	// Serve metrics on the configured path
-	httpServer.HTTPMultiplexer.Handle(config.MetricsPath, promhttp.HandlerFor(prometheusRegistry, promhttp.HandlerOpts{
-		Registry: prometheusRegistry,
-
-		EnableOpenMetrics: true,
-
-		DisableCompression: false,
-
-		MaxRequestsInFlight: 25,
-		Timeout:             10 * time.Second,
-	}))
+	httpServer.HTTPMultiplexer.Handle(config.MetricsPath, metrics.Handler(prometheusRegistry))
 
 	// Start HTTP server in the background
 	group.Go(func() error {
@@ -147,29 +141,28 @@ func main() {
 
 	/***********************/
 
-	// TODO: Add background task to fetch carbon intensity data and update metrics every 30 minutes
 	group.Go(func() error {
 		// Fire immediately, don't wait for the first tick
 		if err := refreshMetrics(); err != nil {
-			log.Warn("Failed to refresh carbon intensity metrics", "error", err)
+			logger.Warn("Failed to refresh carbon intensity metrics", "error", err)
 		}
 
 		for {
 			// Update every 30 minutes on the clock to align with the update schedule of the API
 			nextUpdateTime := calculateNextUpdateTime()
-			log.Debug("Next carbon intensity data refresh scheduled", "time", nextUpdateTime)
+			logger.Debug("Next carbon intensity data refresh scheduled", "time", nextUpdateTime)
 
 			timer := time.NewTimer(time.Until(nextUpdateTime))
 
 			select {
 			case <-timer.C:
 				if err := refreshMetrics(); err != nil {
-					log.Warn("Failed to refresh carbon intensity metrics", "error", err)
+					logger.Warn("Failed to refresh carbon intensity metrics", "error", err)
 				}
 
 			case <-ctx.Done():
 				timer.Stop()
-				log.Info("Stopped refreshing carbon intensity data")
+				logger.Info("Stopped refreshing carbon intensity data")
 				return nil
 			}
 		}
@@ -178,7 +171,7 @@ func main() {
 	/***********************/
 
 	if err := group.Wait(); err != nil {
-		log.Error("Error in execution group", "error", err)
+		logger.Error("Error in execution group", "error", err)
 		os.Exit(1)
 	}
 }

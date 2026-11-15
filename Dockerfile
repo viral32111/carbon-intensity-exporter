@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # docker buildx build --pull --file Dockerfile --tag ghcr.io/viral32111/carbon-intensity-exporter:latest .
-# docker container run --publish 8080:8080 --rm ghcr.io/viral32111/carbon-intensity-exporter:latest
+# docker container run --publish 5000:5000 --rm ghcr.io/viral32111/carbon-intensity-exporter:latest
 
 # Minimal image
 FROM scratch
@@ -22,7 +22,7 @@ USER 65534:65534
 ENV CARBON_HTTP_ADDRESS=0.0.0.0
 
 # Publish HTTP server port
-EXPOSE 8080/tcp
+EXPOSE 5000/tcp
 
 # Launch the metrics exporter
 ENTRYPOINT [ "carbon-intensity-exporter" ]

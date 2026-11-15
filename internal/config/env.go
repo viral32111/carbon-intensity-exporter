@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"strconv"
+	"time"
 )
 
 const (
@@ -21,8 +22,8 @@ func parseEnvString(key, fallback string) string {
 
 func parseEnvNumber(key string, fallback int) (int, error) {
 	if value := os.Getenv(ENVIRONMENT_VARIABLE_PREFIX + key); value != "" {
-		var number int
-		if _, err := fmt.Sscanf(value, "%d", &number); err != nil {
+		number, err := strconv.Atoi(value)
+		if err != nil {
 			return 0, fmt.Errorf("Failed to parse %q as integer: %w", value, err)
 		}
 
@@ -40,6 +41,19 @@ func parseEnvBool(key string, fallback bool) (bool, error) {
 		}
 
 		return b, nil
+	}
+
+	return fallback, nil
+}
+
+func parseEnvDuration(key string, fallback time.Duration) (time.Duration, error) {
+	if value := os.Getenv(ENVIRONMENT_VARIABLE_PREFIX + key); value != "" {
+		duration, err := time.ParseDuration(value)
+		if err != nil {
+			return 0, fmt.Errorf("Failed to parse %q as duration: %w", value, err)
+		}
+
+		return duration, nil
 	}
 
 	return fallback, nil
